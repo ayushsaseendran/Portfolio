@@ -1,0 +1,90 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_CM
+        description: "Source table containing committee information."
+        columns:
+          - name: CMTE_ID
+            description: "ID of the committee."
+          - name: CMTE_NM
+            description: "Name of the committee."
+          - name: TRES_NM
+            description: "Name of the Treasurer."
+          - name: STREET_1
+            description: "Address line 1 of the committee."
+          - name: STREET_2
+            description: "Address line 2 of the committee."
+          - name: CITY
+            description: "City of the committee."
+          - name: STATE
+            description: "State code of the committee."
+          - name: ZIP
+            description: "ZIP code of the committee."
+          - name: CMTE_DSGN
+            description: "Designation code of the committee."
+          - name: CMTE_TP
+            description: "Type code of the committee."
+          - name: CMTE_PTY_AFFILIATION
+            description: "Party affiliation of the committee."
+          - name: CMTE_FILING_FREQ
+            description: "Filing frequency of the committee."
+          - name: ORG_TP
+            description: "Organization type code."
+          - name: CONNECTED_ORG_NM
+            description: "Name of the connected organization."
+          # Add descriptions for other fields as needed.
+
+      - name: STA_CN
+        description: "Source table containing candidate information."
+        columns:
+          - name: CAND_ID
+            description: "ID of the candidate."
+          # Add descriptions for other candidate-related fields as needed.
+
+models:
+  - name: dim_committees
+    description: "Dimension table for committee details, including a relation to candidates."
+    config:
+      materialized: "table"
+      schema: FEC
+    columns:
+      - name: committee_key
+        description: "Surrogate key for the committee dimension."
+        tests:
+          - unique
+          - not_null
+      - name: committee_id
+        description: "Unique identifier for the committee, matches CMTE_ID in source."
+        tests:
+          - unique
+          - not_null
+      - name: candidate_id
+        description: "Identifier of the candidate associated with the committee, derived from CMTE_ID."
+      - name: party_affiliation
+        description: "Detail about the party affiliation."
+      - name: type_code
+        description: "Type of the code for the committee."
+      - name: designation_code
+        description: "Designation code of the committee."
+      - name: filing_frequency_code
+        description: "Filing frequency code of the committee."
+      - name: organization_type_code
+        description: "Organization type code for the committee."
+      - name: committee_name
+        description: "Name of the committee."
+      - name: treasurer_name
+        description: "Name of the Treasurer of the committee."
+      - name: street_address1
+        description: "Primary street address of the committee."
+      - name: street_address2
+        description: "Secondary street address of the committee."
+      - name: city
+        description: "City of the committee."
+      - name: state_code
+        description: "State code of the committee."
+      - name: zip_code
+        description: "ZIP code of the committee."

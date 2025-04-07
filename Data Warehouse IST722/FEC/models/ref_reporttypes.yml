@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_REPORT_TYPES
+        columns:
+          - name: REPORTTYPECODE
+            description: "A unique 3-character code identifying the report type."
+          - name: REPORTTYPENAME
+            description: "The name of the report type."
+          - name: REPORTTYPEDESC
+            description: "A detailed description of the report type."
+
+models:
+  - name: ref_report_types
+    description: "A model based on STA_REPORT_TYPES to be materialized as a table in the FEC schema."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: REPORTTYPECODE
+        description: "A unique 3-character code identifying the report type."
+      - name: REPORTTYPENAME
+        description: "The name of the report type."
+      - name: REPORTTYPEDESC
+        description: "A detailed description of the report type."

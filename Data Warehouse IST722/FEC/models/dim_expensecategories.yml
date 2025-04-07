@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_EXPENSE_CATEGORIES
+        description: "Source table containing expense category information."
+        columns:
+          - name: EXPENSECATEGORYCODE
+            description: "A unique 3-character code identifying the expense category."
+            tests:
+              - unique
+              - not_null
+          - name: EXPENSECATEGORYLABEL
+            description: "The label or title of the expense category."
+            tests:
+              - not_null
+          - name: EXPENSECATEGORYDESC
+            description: "A detailed description of the expense category."
+            tests:
+              - not_null
+
+models:
+  - name: dim_expense_categories
+    description: "A dimension table for categorizing expenses in the FEC schema."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: expense_category_code
+        description: "A unique 3-character code identifying the expense category."
+        tests:
+          - unique
+          - not_null
+      - name: expense_category_label
+        description: "The label or title of the expense category."
+        tests:
+          - not_null
+      - name: expense_category_desc
+        description: "A detailed description of the expense category."
+        tests:
+          - not_null

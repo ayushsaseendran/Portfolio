@@ -1,0 +1,37 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_ZIPCODES
+        columns:
+          - name: ZIPCODE
+            description: "The 5-digit postal code"
+          - name: CITY
+            description: "The name of the city"
+          - name: STATE
+            description: "The 2-letter state code"
+          - name: LATITUDE
+            description: "The latitude of the zipcode"
+          - name: LONGITUDE
+            description: "The longitude of the zipcode"
+
+models:
+  - name: ref_zipcode
+    description: "A model based on STA_ZIPCODES to be materialized as a table in the FEC schema."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: ZIPCODE
+        description: "The 5-digit postal code"
+      - name: CITY
+        description: "The name of the city"
+      - name: STATE
+        description: "The 2-letter state code"
+      - name: LATITUDE
+        description: "The latitude of the zipcode"
+      - name: LONGITUDE
+        description: "The longitude of the zipcode"

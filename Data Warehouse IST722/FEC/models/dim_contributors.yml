@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: dim_contributor
+    description: "Dimension table for contributors' details, including transaction information."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: contributor_key
+        description: "Surrogate key for the contributor dimension."
+        tests:
+          - unique
+          - not_null
+      - name: contributor_name
+        description: "Name of the contributor."
+        tests:
+          - not_null
+      - name: city
+        description: "City of the contributor."
+        tests:
+          - not_null
+      - name: state
+        description: "State of the contributor."
+        tests:
+          - not_null
+      - name: zip_code
+        description: "ZIP code of the contributor."
+        tests:
+          - not_null
+      - name: employer
+        description: "Name of the contributor's employer."
+      - name: occupation
+        description: "Occupation of the contributor."
+      - name: transaction_type
+        description: "Type of the transaction."
+        tests:
+          - not_null
+      - name: transaction_amount
+        description: "Amount of the transaction."
+        tests:
+          - not_null
+      - name: transaction_id
+        description: "Unique identifier for the transaction."
+        tests:
+          - unique
+          - not_null
+      - name: sub_id
+        description: "Unique identifier for the transaction submission."
+        tests:
+          - unique
+          - not_null

@@ -1,0 +1,95 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: sta_indiv
+        description: "The source table for individual contributions."
+
+models:
+  - name: fact_campaign_expenditure
+    description: "A fact table that stores campaign operating expenditure transactions."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: expenditurekey
+        description: "Unique key for each transaction."
+        tests:
+          - unique
+          - not_null
+      - name: datekey
+        description: "Foreign key to date dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: "datekey"
+      - name: statekey
+        description: "Foreign key to state dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_state')
+              field: "statekey"
+      - name: committeekey
+        description: "Foreign key to committee dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_committie')
+              field: "committeekey"
+      - name: payeekey
+        description: "Foreign key to payee dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_payees')
+              field: "payeekey"
+      - name: amount
+        description: "Amount of expenditure."
+        tests:
+          - not_null
+
+  - name: dim_operating_expenditures
+    description: "Dimension table for operating expenditures in campaign finance."
+    columns:
+      - name: expenditure_key
+        description: "Unique key for each operating expenditure transaction."
+        tests:
+          - unique
+          - not_null
+      - name: date_key
+        description: "Foreign key to date dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: "datekey"
+      - name: state_key
+        description: "Foreign key to state dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_state')
+              field: "statekey"
+      - name: committee_key
+        description: "Foreign key to committee dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_committie')
+              field: "committeekey"
+      - name: payee_key
+        description: "Foreign key to payee dimension."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_payees')
+              field: "payeekey"
+      - name: amount
+        description: "Amount of expenditure."
+        tests:
+          - not_null

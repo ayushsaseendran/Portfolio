@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_OPERATING_EXPENDITURES
+        description: "Table containing operating expenditures information."
+        columns:
+          - name: PURPOSE
+            description: "The purpose of the expenditure."
+
+models:
+  - name: dim_expense_purpose
+    description: "Dimension table for the purposes of expenses."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: expense_purpose_key
+        description: "Surrogate key for the expense purpose dimension."
+        tests:
+          - unique
+          - not_null
+      - name: expense_purpose
+        description: "The purpose of the expense as described in the expenditure data."
+        tests:
+          - not_null

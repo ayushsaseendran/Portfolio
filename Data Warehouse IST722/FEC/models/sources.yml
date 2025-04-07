@@ -1,0 +1,48 @@
+version: 2
+
+sources:
+  - name: fec
+    database: campaign_finance
+    schema: staged
+    tables:
+      - name: sta_cm
+        columns:
+          - name: cmte_id
+            tests:
+              - unique
+      - name: sta_cn
+        columns:
+          - name: cand_id
+            tests:
+              - unique
+      - name: sta_dates
+        columns:
+          - name: DATEKEY
+            tests:
+              - unique
+      - name: sta_expense_categories
+        columns:
+          - name: expensecategorycode
+            tests:
+              - unique
+      - name: sta_indiv
+        columns:
+          - name: sub_id
+            tests:
+              - unique
+      - name: sta_operating_expenditures
+        columns:
+          - name: sub_id
+            tests:
+              - unique
+      - name: sta_report_types
+        columns:
+          - name: reporttypecode
+            tests:
+              - unique
+      - name: sta_zipcodes
+        columns:
+          - name: zipcode
+            tests:
+              - unique
+              

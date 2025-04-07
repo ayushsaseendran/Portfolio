@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: dim_state
+    description: "Dimension table for state details with full state names derived from state codes."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: state_key
+        description: "Surrogate key for the state dimension."
+        tests:
+          - unique
+          - not_null
+      - name: state_code
+        description: "State abbreviation."
+        tests:
+          - unique
+          - not_null
+      - name: state_name
+        description: "Full state name derived from the state abbreviation using a CASE statement."
+        tests:
+          - not_null

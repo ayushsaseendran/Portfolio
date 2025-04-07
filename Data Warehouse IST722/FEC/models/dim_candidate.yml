@@ -1,0 +1,46 @@
+version: 2
+models:
+  - name: dim_candidate
+    description: "Dimension table for candidate details."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: candidate_key
+        description: "Surrogate key for the candidate dimension."
+        tests:
+          - unique
+          - not_null
+      - name: candidate_id
+        description: "Unique identifier of the candidate."
+        tests:
+          - unique
+          - not_null
+      - name: principal_committee_id
+        description: "Identifier of the principal committee."
+      - name: party_code
+        description: "Code representing the candidate's party affiliation."
+      - name: office_code
+        description: "Code representing the office the candidate is running for."
+      - name: election_year
+        description: "The election year."
+      - name: office_state_code
+        description: "State code of the office the candidate is running for."
+      - name: district_number
+        description: "District number associated with the candidate."
+      - name: incumbent_code
+        description: "Code indicating whether the candidate is an incumbent."
+      - name: status_code
+        description: "Current status code of the candidate."
+      - name: candidate_name
+        description: "Full name of the candidate."
+      - name: street_address1
+        description: "Primary street address of the candidate."
+      - name: street_address2
+        description: "Secondary street address of the candidate."
+      - name: city
+        description: "City of the candidate's address."
+      - name: state_code
+        description: "State code of the candidate's address."
+      - name: zip_code
+        description: "ZIP code of the candidate's address."

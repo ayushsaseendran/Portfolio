@@ -1,0 +1,54 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_INDIV
+        description: "Source table containing individual transaction information."
+        columns:
+          - name: NAME
+            description: "Name of the payee."
+          - name: CITY
+            description: "City of the payee."
+          - name: STATE
+            description: "State of the payee."
+          - name: ZIP_CODE
+            description: "Zip code of the payee."
+          # ... other columns as necessary ...
+      # - name: STA_OPERATING_EXPENDITURES
+      #  description: "Source table containing operating expenditures."
+
+models:
+  - name: dim_payee
+    description: "Dimension table for payee details."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: payee_key
+        description: "Surrogate key for the payee dimension."
+        tests:
+          - unique
+          - not_null
+      - name: payee_name
+        description: "Name of the payee."
+        tests:
+          - not_null
+      - name: payee_city
+        description: "City of the payee."
+        tests:
+          - not_null
+      - name: payee_state
+        description: "State of the payee."
+        tests:
+          - not_null
+      - name: payee_zip_code
+        description: "Zip code of the payee."
+        tests:
+          - not_null
+      - name: payee_sub_id
+        description: "Unique identifier for the transaction submission."
+        tests:
+          - not_null

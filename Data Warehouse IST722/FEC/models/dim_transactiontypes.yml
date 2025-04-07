@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: STAGED
+    database: CAMPAIGN_FINANCE
+    schema: STAGED
+    tables:
+      - name: STA_TRANSACTIONTYPE
+        description: "Table containing transaction type information."
+        columns:
+          - name: TRANSACTION_TYPE
+            description: "Code of the transaction type."
+          - name: TRANSACTION_TYPE_DESCRIPTION
+            description: "Description about the transaction type."
+
+models:
+  - name: dim_transactiontype
+    description: "Dimension table for transaction types."
+    config:
+      materialized: table
+      schema: FEC
+    columns:
+      - name: transaction_type_key
+        description: "Surrogate key for the transaction type dimension."
+        tests:
+          - unique
+          - not_null
+      - name: transaction_type
+        description: "Code of the transaction type."
+        tests:
+          - not_null
+      - name: transaction_type_desc
+        description: "Description about the transaction type."
+        tests:
+          - not_null
