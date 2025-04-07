@@ -1,4 +1,4 @@
-# 🇺🇸 FEC Individual Contribution Data Analysis (2007-2008 Election)
+# United States FEC Individual Contribution Data Analysis (2007-2008 Election)
 
 ## 📌 Project Overview
 
