@@ -1,0 +1,135 @@
+---
+title: "data_exploring"
+author: "Francisco Franco Arenas"
+date: "2023-10-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+0. clear environment, package load and set directory
+```{r}
+rm(list = ls())
+
+
+##carga paquetes
+
+PAQUETES <- c("dplyr","tidyverse","ggplot2","here","arrow","lubridate","readxl")
+
+for (el in PAQUETES){
+  if (!require(el, character.only = TRUE)) {
+    install.packages(el, repos = "https://cloud.r-project.org")
+    require(el, character.only = TRUE)
+  }
+}
+
+rm(PAQUETES, el)
+
+path<-here()
+setwd(path)
+
+```
+
+
+data load
+```{r}
+setwd(path)
+
+selected_features <- read_excel(paste0(path,"/data/data_dictionary.xlsx"),sheet=3) %>% pull()
+
+house_static_data <- read_parquet("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet")
+house_static_data <-house_static_data %>% 
+  select(bldg_id,selected_features) %>% 
+  mutate(county_id=house_static_data$in.county)
+
+```
+
+```{r}
+house_static_data %>% 
+  is.na() %>% 
+  apply(MARGIN=2,FUN = sum) %>% 
+  sum()
+# there are no NAs
+```
+
+```{r}
+class_counts <- house_static_data %>% 
+    select(where(is.character)) %>% 
+    sapply(function(x) length(unique(x)))
+class_counts
+```
+```{r}
+# select only those that have more than 1 class
+  house_static_data %>% select(where(~length(unique(.)) > 1)) -> house_static_data
+```
+
+```{r}
+column_classes <- house_static_data %>% 
+  summarise(across(everything(), class)) %>% 
+  gather(key = "column", value = "class")
+
+print(column_classes)
+```
+
+```{r}
+house_static_data %>%
+  mutate(across(where(is.character),as.factor)) %>% 
+  mutate(across(where(is.factor), as.numeric)) ->encoded_house_data
+```
+
+```{r}
+temperature <-read_csv("~/GitHub/household_energy_consumption/data/temperature.csv") %>% 
+  rename(time=date_time)
+
+temperature %>% 
+  is.na() %>% 
+  apply(MARGIN=2,FUN = sum) %>% 
+  sum()
+```
+visualize how energy consumtion changes with temperature for specific houses
+```{r}
+plot_data <-read_csv("C:/Users/franc/OneDrive/MADS/IST687/final_project/electricity_consumption.csv") %>%
+  left_join(house_static_data,by="bldg_id") %>% 
+  left_join(temperature,by=c("county_id","time")) %>% #join with encoded data
+  select(c(bldg_id,temperature,total_electricity))
+
+
+house = plot_data$bldg_id[1]
+house_plot <- plot_data %>% 
+    filter(bldg_id==as.character(house)) %>% 
+    ggplot(aes(x=temperature,y=total_electricity)) +
+    geom_point() +
+    theme_classic()+
+    ylab("Hourly electricity consumption (kWh)")
+
+ggsave("~/GitHub/household_energy_consumption/plots/house_plot.png", house_plot, width = 10, height = 8, dpi = 300)
+
+```
+the same for a county
+```{r}
+plot_data <-read_csv("C:/Users/franc/OneDrive/MADS/IST687/final_project/electricity_consumption.csv") %>%
+  # sample_frac(.20) %>% 
+  left_join(house_static_data,by="bldg_id") %>% 
+  left_join(temperature,by=c("county_id","time")) %>% #join with encoded data
+  select(c(bldg_id,temperature,total_electricity,county_id,time)) %>% 
+  group_by(county_id,time) %>% 
+  summarise(
+    total_electricity=sum(total_electricity),
+    temperature = mean(temperature)
+  )
+
+county = plot_data$county_id[1]
+county_plot<-plot_data %>% 
+    filter(county_id==county) %>% 
+    ggplot(aes(x=temperature,y=total_electricity)) +
+    geom_point() +
+    theme_classic()+
+    ylab("Hourly electricity consumption (kWh)")
+
+
+ggsave("~/GitHub/household_energy_consumption/plots/county_plot.png", county_plot, width = 10, height = 8, dpi = 300)
+
+```

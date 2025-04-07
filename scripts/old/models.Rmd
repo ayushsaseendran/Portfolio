@@ -1,0 +1,326 @@
+---
+title: "model"
+output: html_document
+date: "2023-11-16"
+---
+
+0. clear environment, package load and set directory
+```{r}
+rm(list = ls())
+
+
+##carga paquetes
+
+PAQUETES <- c("dplyr","tidyverse","ggplot2","here","arrow","lubridate","readxl","randomForest","doParallel","caret","plm")
+
+for (el in PAQUETES){
+  if (!require(el, character.only = TRUE)) {
+    install.packages(el, repos = "https://cloud.r-project.org")
+    require(el, character.only = TRUE)
+  }
+}
+
+rm(PAQUETES, el)
+
+path<-here()
+setwd(path)
+
+```
+
+load dataframes
+```{r}
+setwd(path)
+selected_importance_names<-readRDS("~/GitHub/household_energy_consumption/selected_importance_names.RDS")
+
+
+selected_features <- read_excel("~/GitHub/household_energy_consumption/data/data_dictionary.xlsx",sheet=1)%>% 
+  filter(selected=="y")%>% 
+  pull(field_name)
+
+house_static_data <- read_parquet("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet") %>% 
+  select(bldg_id,selected_features) %>% 
+  select(where(~length(unique(.)) > 1)) 
+
+house_static_data %>%
+ select(any_of(c(selected_importance_names, "bldg_id", "county_id"))) %>% 
+  mutate(across(where(is.character),as.factor)) %>% 
+  mutate(county_id=house_static_data$in.county)->encoded_house_data #I need the county id in code for the join
+
+temperature <-read_csv("~/GitHub/household_energy_consumption/data/temperature.csv") %>% 
+  rename(time=date_time)
+
+
+```
+
+
+
+feature exploration
+```{r}
+encoded_house_data %>% select(in.clothes_dryer) %>% unique()
+
+# transform the income strings into numbers
+encoded_house_data %>% select(in.income) %>%
+  unique() %>% 
+  mutate(
+    income_lower_bound=str_extract(in.income, "^[^-]*"),
+    income_lower_bound=str_replace(income_lower_bound,"<10000","5000"),
+    income_lower_bound=str_replace(income_lower_bound,"200000\\+","200000"),
+    income_lower_bound=as.numeric(income_lower_bound)
+  ) %>% 
+  arrange(income_lower_bound) -> income_dictionary
+
+encoded_house_data %>% select(in.usage_level) %>%
+  unique()
+
+encoded_house_data %>% select(in.plug_load_diversity) %>%
+  unique()
+
+encoded_house_data %>% select(in.ducts) %>%
+  unique()
+
+encoded_house_data %>% select(in.insulation_wall) %>%
+  unique()
+
+encoded_house_data %>% select(in.windows) %>%
+  unique()
+
+encoded_house_data %>% select(in.hvac_cooling_efficiency) %>%
+  unique()
+
+encoded_house_data %>% select(in.geometry_garage) %>%
+  unique()
+
+encoded_house_data %>% select(in.city) %>%
+  unique()
+
+encoded_house_data %>% select(in.window_areas) %>%
+  unique()
+encoded_house_data %>% select(in.orientation) %>%
+  unique()
+
+encoded_house_data %>% select(in.insulation_ceiling) %>%
+  unique()
+encoded_house_data %>% select(in.pv_system_size) %>%
+  unique()
+encoded_house_data %>% select(in.cooling_setpoint_offset_period) %>%
+  unique()
+
+encoded_house_data %>% select(in.geometry_wall_exterior_finish) %>%
+  unique()
+encoded_house_data %>% select(in.ceiling_fan) %>%
+  unique()
+
+encoded_house_data %>% select(in.usage_level) %>%
+  unique()
+
+
+```
+
+
+feature engineering
+```{r}
+
+encoded_house_data %>% 
+  select(-in.geometry_floor_area) %>%  # in sqft
+  mutate(
+    clothes_drier_type = str_extract(in.clothes_dryer, "^[^,]*"), #type of clothes dryer
+    clothes_dryer_usage = str_extract(in.clothes_dryer, "(?<=\\s).+?(?=%)"), #usage of clothes dryer
+    clothes_dryer_usage= as.numeric(clothes_dryer_usage), #to numeric
+    clothes_dryer_usage = replace_na(clothes_dryer_usage,0)
+    ) %>% #nas are 0
+  select(-in.clothes_dryer) %>%  #drop in.clothes drier
+  mutate(infiltration_ACH50 = as.numeric(str_extract(in.infiltration, "^[^ ]*"))) %>% #is a number in reality
+  select(-in.infiltration) %>% 
+  left_join(income_dictionary,by="in.income") %>% 
+  select(-in.income) %>% 
+  mutate(
+    in.occupants=as.numeric(in.occupants),
+    ) %>% 
+  mutate(
+    in.plug_load_diversity=as.numeric(str_extract(in.plug_load_diversity, "^[^%]*")),
+    duct_leakage=as.numeric(str_extract(in.ducts, "^[^%]*")),
+    duct_leakage=replace_na(duct_leakage,0),
+    duct_insulation_quality = as.numeric(str_extract(in.ducts, "(?<=-).*")),
+    duct_insulation_quality=replace_na(duct_insulation_quality,0),
+  ) %>% 
+  select(-in.ducts) %>% 
+  mutate(
+    wall_material = str_extract(in.insulation_wall, "^[^,]+"),
+    wall_insulation_quality = replace_na(as.numeric(str_extract(in.insulation_wall, "(?<=R-)\\d+")), 0)
+  ) %>% 
+  select(-in.insulation_wall) %>% 
+  mutate(
+    in.vintage=as.numeric(
+        case_when(
+          in.vintage=="<1940" ~ "1940",
+          T ~ substr(in.vintage,1,4))
+        )
+  ) %>% 
+  separate(in.windows, into = c("winPane", "winGlazing", "winFrame", "winFill", "winAdditional"), sep = ", ", fill = "right") %>%
+  mutate(
+    winPane = replace_na(winPane, "None"),
+    winGlazing = replace_na(winGlazing, "None"),
+    winFrame = replace_na(winFrame, "None"),
+    winFill = replace_na(winFill, "None"),
+    winAdditional = replace_na(winAdditional, "None")
+  ) %>%
+  mutate(
+    winPane = factor(winPane),
+    winGlazing = factor(winGlazing),
+    winFrame = factor(winFrame),
+    winFill = factor(winFill),
+    winAdditional = factor(winAdditional)
+  ) %>% 
+  mutate(in.cooling_setpoint=as.numeric(substr(in.cooling_setpoint,1,2))) %>% 
+  mutate(
+    HVAC_type = case_when(
+      str_detect(in.hvac_cooling_efficiency, "AC,") ~ "AC",
+      str_detect(in.hvac_cooling_efficiency, "Heat Pump") ~ "Heat Pump",
+      str_detect(in.hvac_cooling_efficiency, "Room AC,") ~ "Room AC",
+      TRUE ~ "None"  # Default case if none of the above matches
+    ),
+    HVAC_efficiency = as.numeric(str_extract(in.hvac_cooling_efficiency, "\\d+\\.?\\d*"))  # Extracts numbers, including decimals if present
+  ) %>%
+  # Replace NAs with zeros in efficiency if no number is found
+  mutate(
+    HVAC_efficiency = replace_na(HVAC_efficiency, 0)
+  ) %>% 
+  select(-in.hvac_cooling_efficiency) %>% 
+  mutate(
+    in.geometry_garage = as.numeric(substr(in.geometry_garage, 1, 1)),
+    in.geometry_garage = replace_na(in.geometry_garage, 0)
+    ) %>% 
+  select(-in.city) %>% #most are "other"
+  mutate(
+    in.window_areas = 4*as.numeric(str_extract(in.window_areas, "\\d+"))
+  ) %>% 
+  select(-in.federal_poverty_level) %>%  #colinear with income
+  mutate(
+    in.insulation_ceiling = case_when(
+      in.insulation_ceiling == "Uninsulated" ~ 0,  # Assuming uninsulated means R-0
+      in.insulation_ceiling == "None" ~ 0,         # Assuming none means R-0
+      TRUE ~ as.numeric(str_extract(in.insulation_ceiling, "\\d+"))
+    )
+  ) %>% 
+    mutate(
+    in.pv_system_size = case_when(
+      in.pv_system_size == "None" ~ 0,  # Assign 0 to 'None'
+      TRUE ~ as.numeric(str_extract(in.pv_system_size, "\\d+\\.?\\d*"))  # Extract numeric kW value
+    )
+  ) %>% 
+  select(-in.has_pv) %>%  # in pv_system_size
+  mutate(
+    cooling_Day_Adjustment = as.integer(grepl("Day", in.cooling_setpoint_offset_period)),
+    cooling_Night_Adjustment = as.integer(grepl("Night", in.cooling_setpoint_offset_period)),
+    cooling_Hour_Offset = as.numeric(str_extract(in.cooling_setpoint_offset_period, "[-+]?\\d+"))
+  ) %>%
+  # Replace NAs with zeros if no offset is specified
+  mutate(
+    cooling_Hour_Offset = replace_na(cooling_Hour_Offset, 0)
+  ) %>% 
+  select(-in.cooling_setpoint_offset_period) %>% 
+  mutate(
+    wall_material = case_when(
+      str_detect(in.geometry_wall_exterior_finish, "Wood") ~ "Wood",
+      str_detect(in.geometry_wall_exterior_finish, "Aluminum") ~ "Aluminum",
+      str_detect(in.geometry_wall_exterior_finish, "Vinyl") ~ "Vinyl",
+      str_detect(in.geometry_wall_exterior_finish, "Brick") ~ "Brick",
+      str_detect(in.geometry_wall_exterior_finish, "Stucco") ~ "Stucco",
+      str_detect(in.geometry_wall_exterior_finish, "Fiber-Cement") ~ "Fiber-Cement",
+      str_detect(in.geometry_wall_exterior_finish, "Shingle") ~ "Shingle",
+      in.geometry_wall_exterior_finish == "None" ~ "None",
+      TRUE ~ "Other"
+    ),
+    wall_color_lightness = case_when(
+      str_detect(in.geometry_wall_exterior_finish, "Light") ~ "Light",
+      str_detect(in.geometry_wall_exterior_finish, "Medium") ~ "Medium",
+      str_detect(in.geometry_wall_exterior_finish, "Dark") ~ "Dark",
+      TRUE ~ "None"
+    )
+  ) %>% 
+  select(-in.geometry_wall_exterior_finish) %>% 
+  mutate(
+    in.ceiling_fan = as.integer(in.ceiling_fan == "Standard Efficiency")  # 1 if in use, 0 otherwise
+  ) %>% 
+  mutate(
+    in.usage_level = case_when(
+      in.usage_level == "Low" ~ 1,
+      in.usage_level == "Medium" ~ 2,
+      in.usage_level == "High" ~ 3,
+      TRUE ~ NA_real_  # for any cases that might not match the above, resulting in an NA
+    )
+  ) -> encoded_house_data
+  
+```
+
+
+create a df with the selected features and all the rows
+```{r}
+
+
+data <-read_csv("C:/Users/franc/OneDrive/MADS/IST687/final_project/electricity_consumption.csv") %>%
+  # sample_frac(.20) %>% 
+  left_join(encoded_house_data,by="bldg_id") %>% 
+  left_join(temperature,by=c("county_id","time")) %>% #join with encoded data
+  mutate(bldg_id=factor(bldg_id))
+
+data %>%
+  select(-county_id,in.county) %>% #remove the  the county in code
+  mutate(day = day(time)) %>%
+  mutate(day_of_week = as.numeric(factor(wday(time, label = TRUE)))) %>%
+  filter(!is.na(temperature)) %>%  #drop the counties where I do not have the temperature
+  mutate(hour=as.numeric(hour(time))) %>%
+  select(-time) -> data
+
+```
+
+We can get rid of some features
+```{r}
+selected_importance_names_2<-readRDS("~/GitHub/household_energy_consumption/selected_importance_names_2.RDS")
+
+data %>% 
+  select(any_of(selected_importance_names_2),total_electricity,bldg_id) %>% 
+  select(-in.weather_file_longitude,-in.weather_file_latitude) -> data #colinear with other features
+
+
+```
+
+
+
+
+try a linear regression. There is not test train split, because as we are triyng to predict each individual consumption for each hour, overfitting is not an issue (is desirable)
+```{r}
+# # Set up cross-validation
+# train_control <- trainControl(method="cv", number=10)
+
+# Train the model with cross-validation
+lm_model <- lm(total_electricity ~ ., data=data)
+
+
+summary(lm_model)
+
+saveRDS(lm_model,"~/GitHub/household_energy_consumption/models/lm_model.RDS")
+
+# Predict on the test set
+predictions <- predict(lm_model, testset)
+
+# Compute RMSE for the test set
+rmse_test <- sqrt(mean((testset$total_electricity - predictions)^2))
+
+# Output the RMSE
+print(rmse_test)
+```
+
+this is esentially a panel poblem with fixed effect. In the panel it makes not sense a train-test split, because what we are trying to predict is the energy consumtion for specific dates for each household, and we do not have data of several years for the same dates.
+```{r}
+panel_data <- pdata.frame(data, index = c("bldg_id", "time"))
+rm(data)
+
+#run a fixed effects model
+panel_model <- plm(total_electricity ~ ., 
+                data = panel_data, 
+                model = "within")
+
+
+```
+

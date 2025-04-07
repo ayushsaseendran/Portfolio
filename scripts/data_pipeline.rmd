@@ -1,0 +1,128 @@
+---
+title: "data_exploring"
+author: "Francisco Franco Arenas"
+date: "2023-10-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+0. clear environment, package load and set directory
+```{r}
+rm(list = ls())
+
+
+##carga paquetes
+
+PAQUETES <- c("dplyr","tidyverse","ggplot2","here","arrow","lubridate")
+
+for (el in PAQUETES){
+  if (!require(el, character.only = TRUE)) {
+    install.packages(el, repos = "https://cloud.r-project.org")
+    require(el, character.only = TRUE)
+  }
+}
+
+rm(PAQUETES, el)
+
+path<-here()
+setwd(path)
+
+# project_path<-substr(path,0,tail(unlist(str_locate_all(path,"/")),2))
+```
+
+
+data load
+```{r}
+
+house_static_data <- read_parquet("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet")
+ids <- house_static_data %>% pull(bldg_id)
+counties <- house_static_data %>% pull(in.county) %>% unique()
+```
+
+
+electricty consumption pipeline
+```{r}
+ii=1
+electricity_consumption <- tibble(total_electricity = numeric(), date = Date())
+
+for (id in ids) {
+  response <- try(read_parquet(paste0("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/2023-houseData/",id,".parquet")))
+  print(ii)
+  if (class(response)[1] == "try-error"){
+    print(paste0("error loading house ",id))
+  }
+  else {
+    response %>%
+    # filter(time >= as.Date("2018-07-01"), time <= as.Date("2018-07-31")) %>%
+    mutate(total_electricity = rowSums(select(., contains("electricity")), na.rm = TRUE)) %>% 
+    select(total_electricity,
+           time,
+           # out.electricity.ceiling_fan.energy_consumption,
+           # out.electricity.cooling_fans_pumps.energy_consumption,
+           # out.electricity.cooling.energy_consumption,
+           # out.electricity.freezer.energy_consumption,
+           # out.electricity.hot_water.energy_consumption,
+           # out.electricity.mech_vent.energy_consumption,
+           # out.electricity.plug_loads.energy_consumption,
+           # out.electricity.pool_heater.energy_consumption
+           ) %>% 
+    # mutate(date = date(time)) %>% 
+    # group_by(date) %>% 
+    # summarise(
+    #   total_electricity=sum(total_electricity)
+    # ) %>% 
+    # ungroup() %>% 
+    mutate(bldg_id=id)-> temp_data
+    
+    electricity_consumption <- rbind(electricity_consumption, temp_data)
+
+    rm(temp_data)
+    ii=ii+1
+  }
+}
+
+write_csv(electricity_consumption,"C:/Users/usuario/OneDrive/MADS/IST687/final_project/electricity_consumption.csv")
+
+
+response %>% colnames()
+```
+
+weather pipeline
+```{r}
+temperature <- tibble(max_temp = numeric(),min_temp = numeric(), avg_temp = numeric(), date = Date())
+
+
+for (county in counties) {
+  response<-read_csv(paste0("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/weather/2023-weather-data/",county,".csv"))
+  response %>%
+    select(date_time,contains("Temperature")) %>% 
+    rename(temperature = `Dry Bulb Temperature [°C]`) %>% 
+    filter(date_time >= as.Date("2018-07-01"), date_time <= as.Date("2018-07-31")) %>% 
+    # mutate(date = date(date_time)) %>% 
+    # group_by(date) %>% 
+    # summarise(
+    #   max_temp = max(temperature),
+    #   min_temp = min(temperature),
+    #   avg_temp = mean(temperature)
+    # ) %>% 
+    # ungroup() %>% 
+    mutate(county_id=county)-> temp_data
+  
+    temperature <- rbind(temperature, temp_data)
+
+    rm(temp_data)
+}
+
+write_csv(temperature,paste0("~/GitHub/household_energy_consumption/data/temperature.csv"))
+
+```
+
+```{r}
+electricity <- read_csv("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/weather/2023-weather-data/G4500910.csv")
+```
+
+

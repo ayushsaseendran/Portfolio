@@ -1,0 +1,85 @@
+---
+title: "prediction"
+output: html_document
+date: "2023-11-15"
+---
+
+0. clear environment, package load and set directory
+```{r}
+rm(list = ls())
+
+
+##carga paquetes
+
+PAQUETES <- c("dplyr","tidyverse","ggplot2","here","arrow","lubridate","readxl","randomForest","doParallel","caret")
+
+for (el in PAQUETES){
+  if (!require(el, character.only = TRUE)) {
+    install.packages(el, repos = "https://cloud.r-project.org")
+    require(el, character.only = TRUE)
+  }
+}
+
+rm(PAQUETES, el)
+
+path<-here()
+setwd(path)
+
+```
+load dataframes
+```{r}
+setwd(path)
+
+selected_features <- read_excel("~/GitHub/household_energy_consumption/data/data_dictionary.xlsx",sheet=3) %>% pull()
+
+house_static_data <- read_parquet("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet") %>% 
+  select(bldg_id,selected_features) %>% 
+  select(where(~length(unique(.)) > 1)) 
+
+house_static_data %>%
+  mutate(across(where(is.character),as.factor)) %>% 
+  # mutate(across(where(is.factor), as.numeric)) %>% 
+  mutate(in.cooling_setpoint=as.numeric(substr(in.cooling_setpoint,1,2))) %>% #convert to number
+  mutate(in.cooling_setpoint_offset_magnitude=as.numeric(substr(in.cooling_setpoint_offset_magnitude,1,1))) %>% #convert to number
+  mutate(in.cooling_setpoint_offset_period = factor(str_extract(in.cooling_setpoint_offset_period, "^[^-+]*"))) %>%  #reomve the ofset magnitude as it is in another column
+  mutate(county_id=house_static_data$in.county)->encoded_house_data #I need the county id in code for the join
+
+temperature <-read_csv("~/GitHub/household_energy_consumption/data/temperature.csv") %>% 
+  rename(time=date_time)
+
+```
+
+Load a sample of the Energy consumption
+```{r}
+selected_importance_names<-readRDS("~/GitHub/household_energy_consumption/selected_importance_names.RDS")
+
+data <-read_csv("C:/Users/franc/OneDrive/MADS/IST687/final_project/electricity_consumption.csv") %>%
+  # sample_frac(.25) %>% 
+  left_join(encoded_house_data,by="bldg_id") %>% 
+  left_join(temperature,by=c("county_id","time"))#join with encoded data
+
+data %>% 
+  select(-bldg_id,-county_id) %>% #remove the id and the county in code
+  mutate(day = day(time)) %>% 
+  mutate(day_of_week = as.numeric(factor(wday(time, label = TRUE)))) %>% 
+  filter(!is.na(temperature)) %>%  #drop the counties where I do not have the temperature
+  mutate(hour=factor(hour(time))) %>% 
+  select(-time) %>% 
+  select(selected_importance_names,total_electricity)-> data
+  
+
+```
+
+```{r}
+rf_model <-readRDS("~/GitHub/household_energy_consumption/rf_model.RData")
+# increase the temperature by 5 degress
+data %>% 
+  mutate(temperature=temperature+5) -> data_temp_inc
+
+# Make predictions on new data
+predictions <- predict(rf_model, newdata=data_temp_inc)
+
+
+
+```
+

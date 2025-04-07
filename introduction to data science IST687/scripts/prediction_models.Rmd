@@ -1,0 +1,225 @@
+---
+title: "prediction_models"
+output: html_document
+date: "2023-11-18"
+---
+
+
+0. clear environment, package load and set directory
+```{r}
+rm(list = ls())
+
+
+##carga paquetes
+
+PAQUETES <- c("dplyr","tidyverse","ggplot2","here","arrow","lubridate","readxl","randomForest","plm","caret")
+
+for (el in PAQUETES){
+  if (!require(el, character.only = TRUE)) {
+    install.packages(el, repos = "https://cloud.r-project.org")
+    require(el, character.only = TRUE)
+  }
+}
+
+rm(PAQUETES, el)
+
+path<-here()
+setwd(path)
+
+```
+
+
+```{r}
+house_static_data <- read_parquet("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet") %>% 
+  select(bldg_id,in.county) %>% 
+  rename(county_id=in.county)
+temperature <-read_csv("~/GitHub/household_energy_consumption/data/temperature.csv") %>% 
+  rename(time=date_time)
+data <-read_csv("C:/Users/usuario/OneDrive/MADS/IST687/final_project/electricity_consumption.csv") %>%
+  # sample_frac(.20) %>% 
+  left_join(house_static_data,by="bldg_id") %>% 
+  left_join(temperature,by=c("county_id","time")) %>% #join with encoded data
+  group_by(county_id,time) %>% 
+  summarise(
+    total_electricity=sum(total_electricity),
+    temperature = mean(temperature)
+  ) %>% 
+  mutate(total_electricity=log(total_electricity)) #log transformation so the betas are interpreted as percentage increase/decrease
+
+
+```
+
+Esentially, this is a panel data regression problem, so we need to isolate individual effects and time effects
+```{r}
+panel_data <- pdata.frame(data, index = c("county_id", "time"))
+
+#run a fixed effects model
+panel_model <- plm(total_electricity ~ temperature, 
+                data = panel_data, 
+                model = "within")
+summary(panel_model)
+
+```
+only R squred of 0.13, so it is a bad fit
+
+
+try alternative model extracting hour and date
+```{r}
+data %>% 
+  mutate(day = factor(day(time))) %>% 
+  mutate(day_of_week = factor(as.numeric(wday(time, label = TRUE)))) %>% #start in sunday
+  filter(!is.na(temperature)) %>%  #drop the counties where I do not have the temperature
+  mutate(hour=factor(hour(time))) %>% 
+  select(-day) %>% #colinear with day of the week
+  select(-time)-> data_times
+
+```
+
+```{r}
+lm_model_dates <- lm(total_electricity~.,data=data_times)
+
+summary(lm_model_dates)
+```
+good fit, 0.99
+
+Lets do test train split and cross validation to compare with other models
+```{r}
+set.seed(123)  # for reproducibility
+trainIndex <- createDataPartition(data_times$total_electricity, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+
+dataTrain <- data_times[ trainIndex,]
+dataTest  <- data_times[-trainIndex,]
+
+train_control <- trainControl(method = "cv", number = 10)
+
+```
+
+rerun the previous linear model
+```{r}
+# Train a linear regression model on the training set
+lm_model <- train(total_electricity ~ ., data = dataTrain, method = "lm", trControl = train_control)
+
+# Print the results
+summary(lm_model)
+
+# Make predictions on the test set
+predictions <- predict(lm_model, newdata = dataTest)
+
+# Calculate performance metrics on the test set
+postResample(pred = predictions, obs = dataTest$total_electricity)
+
+saveRDS(lm_model,"C:/Users/franc/OneDrive/MADS/IST687/final_project/lm_model.rds")
+
+```
+
+let's try adding a square term in temperature to account for non linearities
+```{r}
+data_squared <- data_times %>% 
+  mutate(sqr_temperature=temperature^2)
+
+trainIndex <- createDataPartition(data_squared$total_electricity, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+
+dataTrain <- data_squared[ trainIndex,]
+dataTest  <- data_squared[-trainIndex,]
+
+# Train a linear regression model on the training set
+sq_lm_model <- train(total_electricity ~ ., data = dataTrain, method = "lm", trControl = train_control)
+
+
+# Print the results
+summary(sq_lm_model)
+
+# Make predictions on the test set
+predictions <- predict(sq_lm_model, newdata = dataTest)
+
+# Calculate performance metrics on the test set
+postResample(pred = predictions, obs = dataTest$total_electricity)
+
+saveRDS(sq_lm_model,"C:/Users/franc/OneDrive/MADS/IST687/final_project/sq_lm_model.rds")
+
+
+```
+the square term is significant, nonetheless it does not significantly improve the model
+We do not try a random forest, as it struggles with extrapolation, and that is the aim of our analysis.
+
+
+
+Make the predictions for the 5 degrees increase in temperature
+```{r}
+# Increase temperature by 5 degrees in the dataset
+data_pred <- data_times %>% 
+  mutate(temperature=temperature+5) 
+
+# Predict electricity consumption with the updated temperature
+predictions <- predict(lm_model, newdata = data_pred)
+
+# Convert log-scale predictions back to original scale
+data_pred$total_electricity_pred = exp(predictions)
+data_pred$total_electricity = exp(data_pred$total_electricity)
+
+#save the predictions for the shiny app
+saveRDS(data_pred,"~/GitHub/household_energy_consumption/output/predictions.rds")
+```
+
+
+explore the predictions
+```{r}
+data_pred<-readRDS("~/GitHub/household_energy_consumption/output/predictions.rds")
+
+data_pred %>% 
+  mutate(increase = total_electricity_pred - total_electricity) %>% 
+  mutate(increase_perct = (increase/total_electricity)*100) -> data_pred_inc
+avg_inc <- sum(data_pred_inc$increase)/sum(data_pred_inc$total_electricity)*100
+
+data_pred_inc %>%
+  group_by(day_of_week) %>%
+  summarise(
+    increase = sum(increase),
+    total_electricity = sum(total_electricity)
+  ) %>%
+  mutate(increase_perct = (increase / total_electricity) * 100) %>%
+  mutate(day = case_when(
+    day_of_week == 1 ~ "Monday",
+    day_of_week == 2 ~ "Tuesday",
+    day_of_week == 3 ~ "Wednesday",
+    day_of_week == 4 ~ "Thursday",
+    day_of_week == 5 ~ "Friday",
+    day_of_week == 6 ~ "Saturday",
+    day_of_week == 7 ~ "Sunday"
+  )) %>%
+  mutate(day = factor(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  select(increase_perct, day) %>%
+  ggplot(aes(x = day, y = increase_perct)) +
+  geom_col(fill = "deepskyblue4") +
+  labs(x = "Day of the Week", y = "Increase Percentage", title = "Weekly Increase in Electricity Usage") +
+  geom_text(aes(label = paste0(round(increase_perct, 1),"%")), vjust = -0.5) +
+  theme_classic() -> weekly_increase_plot
+
+ggsave("~/GitHub/household_energy_consumption/plots/weekly_increase_plot.png",  weekly_increase_plot, width = 10, height = 8, dpi = 300)
+
+```
+```{r}
+data_pred_inc %>%
+  group_by(hour) %>%
+  summarise(
+    increase = sum(increase),
+    total_electricity = sum(total_electricity)
+  ) %>%
+  mutate(increase_perct = (increase / total_electricity) * 100) %>% 
+  select(increase_perct, hour) %>%
+  ggplot(aes(x = hour, y = increase_perct)) +
+  geom_col(fill = "deepskyblue4") +
+  labs(x = "Hour", y = "Increase Percentage", title = "Hourly Increase in Electricity Usage") +
+  geom_text(aes(label = paste0(round(increase_perct, 1),"%")), vjust = -0.5,size = 2.7) +
+  theme_classic() -> hourly_increase_plot
+
+hourly_increase_plot
+
+ggsave("~/GitHub/household_energy_consumption/plots/hourly_increase_plot.png",  hourly_increase_plot, width = 10, height = 8, dpi = 300)
+
+```
+
