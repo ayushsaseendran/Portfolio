@@ -1,4 +1,4 @@
-# 📄 Ayush Thoniparambil Saseendran - Resume Portfolio
+# 📄 Ayush Thoniparambil Saseendran - Portfolio
 
 ## 🎓 Education
 
