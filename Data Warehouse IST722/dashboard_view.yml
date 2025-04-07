@@ -1,0 +1,31 @@
+# models/individual_contributions.yml
+
+version: 2
+
+models:
+  - name: individual_contributions
+    description: "This table combines individual contribution details with associated committee and candidate information."
+    columns:
+      - name: contribution_key
+        description: "Unique identifier for each individual contribution."
+      - name: candidate_key
+        description: "Reference key to the candidate."
+      - name: contributor_key
+        description: "Reference key to the contributor."
+      - name: report_type_key
+        description: "Reference key to the type of report."
+      - name: transaction_type_key
+        description: "Reference key to the type of transaction."
+      - name: contribution_amount_usd
+        description: "Amount of the contribution in USD."
+      - name: transaction_id
+        description: "Unique identifier for the transaction."
+      - name: committee_id
+        description: "Identifier for the committee that received the contribution."
+      - name: committee_party_affiliation
+        description: "Party affiliation of the committee."
+      - name: committee_type_code
+        description: "Type code of the committee."
+      - name: committee_designation_code
+        description: "Designation code of the committee."
+      - name: committee_filing_frequency_code

@@ -1,0 +1,1185 @@
+--if exists(select * from sys.objects where name='Travel_Managment')
+--drop DATABASE Travel_Managment
+
+--Go
+
+--Create DATABASE Travel_Managment
+
+--Go
+USE Travel_Managment
+--Go
+--DROPPING FOREIGN KEY CONSTRAINTS
+
+-- Drop foreign key constraints
+
+-- Drop the foreign key constraint for cust_zip_code
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_customers_zip_codes')
+    ALTER TABLE customers DROP CONSTRAINT FK_customers_zip_codes;
+
+-- Drop the foreign key constraint for cust_city_id
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_customers_cities')
+    ALTER TABLE customers DROP CONSTRAINT FK_customers_cities;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pid_id_dest')
+    ALTER TABLE PlacesInDestination DROP CONSTRAINT fk_pid_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_acco_id_dest')
+    ALTER TABLE Accommodations DROP CONSTRAINT fk_acco_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_flig_id_dest')
+    ALTER TABLE Flights DROP CONSTRAINT fk_flig_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_acti_id_dest')
+    ALTER TABLE Activities DROP CONSTRAINT fk_acti_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pack_id_dest')
+    ALTER TABLE Packages DROP CONSTRAINT fk_pack_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pack_id_acco')
+    ALTER TABLE Packages DROP CONSTRAINT fk_pack_id_acco;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pack_id_flig')
+    ALTER TABLE Packages DROP CONSTRAINT fk_pack_id_flig;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pack_id_acti')
+    ALTER TABLE Packages DROP CONSTRAINT fk_pack_id_acti;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_cust')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_cust;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_dest')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_acco')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_acco;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_flig')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_flig;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_acti')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_acti;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_book_id_pack')
+    ALTER TABLE Bookings DROP CONSTRAINT fk_book_id_pack;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_cust')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_cust;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_dest')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_dest;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_pack')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_pack;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_acco')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_acco;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_flig')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_flig;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_revi_id_acti')
+    ALTER TABLE Reviews DROP CONSTRAINT fk_revi_id_acti;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pay_id_cust')
+    ALTER TABLE Payments DROP CONSTRAINT fk_pay_id_cust;
+
+IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'fk_pay_id_book')
+    ALTER TABLE Payments DROP CONSTRAINT fk_pay_id_book;
+
+--Go
+--Dropping lookup tables
+
+-- Drop the Zip Codes table if it exists
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'zip_codes' AND type = 'U')
+    DROP TABLE zip_codes;
+
+-- Drop the Cities table if it exists
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'cities' AND type = 'U')
+    DROP TABLE cities;
+
+--Go
+--DROPPING TABLES
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Customerlogin' AND type = 'U')
+    DROP TABLE dbo.Customerlogin;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Users' AND type = 'U')
+    DROP TABLE dbo.Users;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Customers' AND type = 'U')
+    DROP TABLE dbo.Customers;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Destinations' AND type = 'U')
+    DROP TABLE dbo.Destinations;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'PlacesInDestination' AND type = 'U')
+    DROP TABLE dbo.PlacesInDestination;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Accommodations' AND type = 'U')
+    DROP TABLE dbo.Accommodations;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Flights' AND type = 'U')
+    DROP TABLE dbo.Flights;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Activities' AND type = 'U')
+    DROP TABLE dbo.Activities;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Packages' AND type = 'U')
+    DROP TABLE dbo.Packages;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Payments' AND type = 'U')
+    DROP TABLE dbo.Payments;
+
+IF EXISTS (SELECT * FROM sys.objects WHERE name = 'Reviews' AND type = 'U')
+    DROP TABLE dbo.Reviews;
+
+--Go
+--Dropping Views
+
+--IF EXISTS (SELECT * FROM sys.objects WHERE name = 'top_accommodations' AND type = 'V')
+--    DROP VIEW dbo.top_accommodations;
+
+-- Uncomment the following lines as needed
+-- IF EXISTS (SELECT * FROM sys.objects WHERE name = 'top_flights' AND type = 'V')
+--     DROP VIEW dbo.top_flights;
+
+-- IF EXISTS (SELECT * FROM sys.objects WHERE name = 'top_packages' AND type = 'V')
+--     DROP VIEW dbo.top_packages;
+
+-- IF EXISTS (SELECT * FROM sys.objects WHERE name = 'top_destinations' AND type = 'V')
+--     DROP VIEW dbo.top_destinations;
+
+-- IF EXISTS (SELECT * FROM sys.objects WHERE name = 'top_customers' AND type = 'V')
+--     DROP VIEW dbo.top_customers;
+
+--Go
+
+---create lookup tables
+
+-- CREATE TABLE for Zip Codes
+CREATE TABLE zip_codes (
+    zip_code INT PRIMARY KEY,
+    city VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE cities (
+    city_id INT PRIMARY KEY IDENTITY(1,1),
+    city_name VARCHAR(50) NOT NULL
+);
+
+Go
+---create tables
+
+
+ -- CREATE TABLE Customerlogin (
+ --     loginID INT PRIMARY KEY IDENTITY(1,1),
+ --     Username VARCHAR(50) UNIQUE NOT NULL,
+ --     Useremail VARCHAR(50) UNIQUE NOT NULL,
+ --     Password VARCHAR(50) NOT NULL,
+ --     CONSTRAINT chk_password_length1 CHECK (LEN(Password) >= 8),
+ --     CONSTRAINT chk_email_format1 CHECK (Useremail LIKE '%_@_%._%') -- Basic email format check
+ -- );
+
+
+-- CREATE TABLE Users (
+--     UserID INT PRIMARY KEY IDENTITY(1,1),
+--     Username VARCHAR(50) UNIQUE NOT NULL,
+--     Useremail VARCHAR(50) UNIQUE NOT NULL,
+--     Password VARCHAR(50) NOT NULL,
+--     CONSTRAINT chk_password_length CHECK (LEN(Password) >= 8),
+--     CONSTRAINT chk_email_format CHECK (Useremail LIKE '%_@_%._%') -- Basic email format check
+-- );
+
+
+
+-- CREATE TABLE for Customers
+CREATE TABLE customers (
+    cust_id INT PRIMARY KEY IDENTITY(1,1),
+    cust_first_name VARCHAR(50) NOT NULL,
+    cust_last_name VARCHAR(50),
+    cust_address VARCHAR(100) NOT NULL CHECK (LEN(cust_address) <= 100),
+    cust_email VARCHAR(50) UNIQUE NOT NULL,
+    cust_phone_number VARCHAR(20) UNIQUE,
+    cust_city VARCHAR(50) NOT NULL,
+    cust_zip_code INT NOT NULL,
+    CONSTRAINT chk_cust_zip_code CHECK (cust_zip_code >= 10000 AND cust_zip_code <= 99999),
+    FOREIGN KEY (cust_zip_code) REFERENCES zip_codes(zip_code),
+    FOREIGN KEY (cust_city) REFERENCES cities(city_name)
+);
+
+
+
+-- CREATE TABLE Destinations (
+--     dest_id INT PRIMARY KEY IDENTITY(1,1),
+--     dest_name VARCHAR(50) NOT NULL UNIQUE,
+--     dest_description VARCHAR(200) NOT NULL,
+--     dest_location VARCHAR(100) NOT NULL,
+--     CONSTRAINT chk_destinationname_length CHECK (LEN(dest_name) <= 50),
+--     CONSTRAINT chk_description_length CHECK (LEN(dest_description) <= 200),
+--     CONSTRAINT chk_location_length CHECK (LEN(dest_location) <= 100)
+-- );
+
+
+-- CREATE TABLE PlacesInDestination (
+--     pid_id INT PRIMARY KEY IDENTITY(1,1),
+--     pid_id_dest INT,
+--     pid_name VARCHAR(100) NOT NULL,
+--     CONSTRAINT fk_pid_id_dest FOREIGN KEY (pid_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT chk_placename_length CHECK (LEN(pid_name) <= 100),
+--     CONSTRAINT uc_place UNIQUE (pid_id_dest, pid_name)
+-- );
+
+
+-- CREATE TABLE Accommodations (
+--     acco_id INT PRIMARY KEY IDENTITY(1,1),
+--     acco_name VARCHAR(100) NOT NULL,
+--     acco_id_dest INT NOT NULL,
+--     acco_type VARCHAR(50) NOT NULL,
+--     acco_price_per_night DECIMAL(10, 2) NOT NULL,
+--     acco_availability INT NOT NULL,
+--     acco_room_capacity INT NOT NULL,
+--     CONSTRAINT fk_acco_id_dest FOREIGN KEY (acco_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT chk_acco_price_per_night CHECK (acco_price_per_night >= 0),
+--     CONSTRAINT chk_acco_availability CHECK (acco_availability >= 0),
+--     CONSTRAINT chk_acco_room_capacity CHECK (acco_room_capacity > 0)
+-- );
+
+
+-- CREATE TABLE Flights (
+--     flig_id INT PRIMARY KEY IDENTITY(1,1),
+--     flig_number VARCHAR(20) NOT NULL,
+--     flig_id_dest INT NOT NULL,
+--     flig_departure_location VARCHAR(100) NOT NULL,
+--     flig_arrival_location VARCHAR(100) NOT NULL,
+--     flig_departure_dt DATETIME NOT NULL,
+--     flig_arrival_dt DATETIME NOT NULL,
+--     flig_price DECIMAL(10, 2) NOT NULL,
+--     flig_airline VARCHAR(50) NOT NULL,
+--     CONSTRAINT fk_flig_id_dest FOREIGN KEY (flig_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT chk_flig_departure_dt CHECK (flig_departure_dt < flig_arrival_dt),
+--     CONSTRAINT chk_flig_price CHECK (flig_price >= 0)
+-- );
+
+
+-- CREATE TABLE Activities (
+--     acti_id INT PRIMARY KEY IDENTITY(1,1),
+--     acti_id_dest INT NOT NULL,
+--     acti_name VARCHAR(100) NOT NULL,
+--     acti_description VARCHAR(200) NOT NULL,
+--     acti_price DECIMAL(10, 2) NOT NULL,
+--     acti_duration INT NOT NULL,
+--     acti_availability INT NOT NULL,
+--     CONSTRAINT fk_acti_id_dest FOREIGN KEY (acti_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT chk_acti_price CHECK (acti_price >= 0),
+--     CONSTRAINT chk_acti_duration CHECK (acti_duration > 0),
+--     CONSTRAINT chk_acti_availability CHECK (acti_availability >= 0)
+-- );
+
+
+-- CREATE TABLE Packages (
+--     pack_id INT PRIMARY KEY IDENTITY(1,1),
+--     pack_name VARCHAR(100) NOT NULL,
+--     pack_id_dest INT NOT NULL,
+--     pack_id_acco INT NOT NULL,
+--     pack_id_flig INT NOT NULL,
+--     pack_id_acti INT NOT NULL,
+--     pack_price DECIMAL(10, 2) NOT NULL,
+--     pack_type VARCHAR(50) NOT NULL,
+--     pack_description VARCHAR(200) NOT NULL,
+--     pack_availability INT NOT NULL,
+--     CONSTRAINT fk_pack_id_dest FOREIGN KEY (pack_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT fk_pack_id_acco FOREIGN KEY (pack_id_acco) REFERENCES Accommodations(acco_id),
+--     CONSTRAINT fk_pack_id_flig FOREIGN KEY (pack_id_flig) REFERENCES Flights(flig_id),
+--     CONSTRAINT fk_pack_id_acti FOREIGN KEY (pack_id_acti) REFERENCES Activities(acti_id),
+--     CONSTRAINT chk_pack_price CHECK (pack_price >= 0),
+--     CONSTRAINT chk_pack_availability CHECK (pack_availability >= 0)
+-- );
+
+
+-- CREATE TABLE Bookings (
+--     book_id INT PRIMARY KEY IDENTITY(1,1),
+--     book_id_cust INT NOT NULL,
+--     book_id_dest INT NOT NULL,
+--     book_id_acco INT,
+--     book_id_flig INT,
+--     book_id_acti INT,
+--     book_id_pack INT,
+--     book_dt DATETIME NOT NULL,
+--     book_check_in_dt DATETIME NOT NULL,
+--     book_check_out_dt DATETIME NOT NULL,
+--     book_total_price DECIMAL(10, 2) NOT NULL,
+--     book_status VARCHAR(50) NOT NULL,
+--     CONSTRAINT fk_book_id_cust FOREIGN KEY (book_id_cust) REFERENCES Customers(cust_id),
+--     CONSTRAINT fk_book_id_dest FOREIGN KEY (book_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT fk_book_id_acco FOREIGN KEY (book_id_acco) REFERENCES Accommodations(acco_id),
+--     CONSTRAINT fk_book_id_flig FOREIGN KEY (book_id_flig) REFERENCES Flights(flig_id),
+--     CONSTRAINT fk_book_id_acti FOREIGN KEY (book_id_acti) REFERENCES Activities(acti_id),
+--     CONSTRAINT fk_book_id_pack FOREIGN KEY (book_id_pack) REFERENCES Packages(pack_id),
+--     CONSTRAINT chk_book_total_price CHECK (book_total_price >= 0)
+-- );
+
+
+-- CREATE TABLE Reviews (
+--     revi_id INT PRIMARY KEY IDENTITY(1,1),
+--     revi_id_cust INT NOT NULL,
+--     revi_id_dest INT NOT NULL,
+--     revi_id_pack INT,
+--     revi_id_acco INT,
+--     revi_id_flig INT,
+--     revi_id_acti INT,
+--     revi_rating INT NOT NULL,
+--     revi_review VARCHAR(500) NOT NULL,
+--     CONSTRAINT fk_revi_id_cust FOREIGN KEY (revi_id_cust) REFERENCES Customers(cust_id),
+--     CONSTRAINT fk_revi_id_dest FOREIGN KEY (revi_id_dest) REFERENCES Destinations(dest_id),
+--     CONSTRAINT fk_revi_id_pack FOREIGN KEY (revi_id_pack) REFERENCES Packages(pack_id),
+--     CONSTRAINT fk_revi_id_acco FOREIGN KEY (revi_id_acco) REFERENCES Accommodations(acco_id),
+--     CONSTRAINT fk_revi_id_flig FOREIGN KEY (revi_id_flig) REFERENCES Flights(flig_id),
+--     CONSTRAINT fk_revi_id_acti FOREIGN KEY (revi_id_acti) REFERENCES Activities(acti_id),
+--     CONSTRAINT chk_revi_rating CHECK (revi_rating >= 1 AND revi_rating <= 5)
+-- );
+
+
+
+-- CREATE TABLE Payments (
+--     pay_id INT PRIMARY KEY IDENTITY(1,1),
+--     pay_id_cust INT NOT NULL,
+--     pay_id_book INT NOT NULL,
+--     pay_method VARCHAR(50) NOT NULL,
+--     pay_transaction_dt DATETIME NOT NULL,
+--     pay_total_amount DECIMAL(10, 2) NOT NULL,
+--     pay_transaction_status VARCHAR(50) NOT NULL,
+--     CONSTRAINT fk_pay_id_cust FOREIGN KEY (pay_id_cust) REFERENCES Customers(cust_id),
+--     CONSTRAINT fk_pay_id_book FOREIGN KEY (pay_id_book) REFERENCES Bookings(book_id),
+--     CONSTRAINT chk_pay_total_amount CHECK (pay_total_amount >= 0)
+-- );
+
+---Create views
+
+ -- create view top_accommodations as
+    -- SELECT
+    --     CONCAT(a.acco_name, ' - ',d.dest_name) AS destination_accommodation,
+    --     COUNT(b.book_id) AS bookings_count
+    -- FROM
+    --     Accommodations a
+    -- JOIN
+    --     Destinations d ON a.acco_id_dest = d.dest_id
+    -- LEFT JOIN
+    --     Bookings b ON a.acco_id = b.book_id_acco
+    -- GROUP BY
+    --     CONCAT(a.acco_name, ' - ',d.dest_name)
+
+
+    -- -- create view top_flights as
+    -- -- SELECT
+    -- --     CONCAT(f.flig_number, ' ', f.flig_airline) AS flight_info,
+    -- --     COUNT(b.book_id) AS bookings_count
+    -- -- FROM
+    -- --     Flights f
+    -- -- LEFT JOIN
+    -- --     Bookings b ON f.flig_id = b.book_id_flig
+    -- -- GROUP BY
+    -- --     CONCAT(f.flig_number, ' ', f.flig_airline)
+
+    -- -- create view top_packages as
+    -- -- SELECT
+    -- --     p.pack_name AS package_name,
+    -- --     COUNT(b.book_id) AS bookings_count
+    -- -- FROM
+    -- --     Packages p
+    -- -- LEFT JOIN
+    -- --     Bookings b ON p.pack_id = b.book_id_pack
+    -- -- GROUP BY
+    -- --     p.pack_name
+
+
+
+    -- -- create view top_destinations AS
+    -- -- SELECT
+    -- --     d.dest_name AS destination_name,
+    -- --     COUNT(b.book_id) AS bookings_count
+    -- -- FROM
+    -- --     Destinations d
+    -- -- LEFT JOIN
+    -- --     Bookings b ON d.dest_id = b.book_id_dest
+    -- -- GROUP BY
+    -- --     d.dest_name
+
+
+-- -- create view top_customers as
+    -- -- SELECT
+    -- --     c.cust_id,
+    -- --     CONCAT(c.cust_first_name, ' ', c.cust_last_name) AS customer_name,
+    -- --     COUNT(b.book_id) AS confirmed_bookings_count
+    -- -- FROM
+    -- --     customers c
+    -- -- JOIN
+    -- --     Bookings b ON c.cust_id = b.book_id_cust
+    -- -- WHERE
+    -- --     b.book_status = 'confirmed'
+    -- -- GROUP BY
+    -- --     c.cust_id, c.cust_first_name, c.cust_last_name
+
+-- Customer inserts
+select * FROM customers;
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Megan', 'Sketch', '129 Oak St', 'meg.s@email.com', '575-1234', 'Huntsville', 50921);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Alice', 'Johnson', '456 Maple Ave', 'alice.jo@email.com', '505-5678', 'Townburg', 12345);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Bob', 'Smith', '789 Pine Rd', 'bob.smith@email.com', '585-9876', 'Villagetown', 98765);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Emily', 'Wilson', '101 Elm Blvd', 'emi.w@email.com', '545-4321', 'Hamletville', 45678);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('David', 'Miller', '202 Cedar Ln', 'da.m@email.com', '525-8765', 'Townsville', 67890);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Sophie', 'Brown', '303 Birch Ct', 'soph.b@email.com', '515-2109', 'Citytown', 23456);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Michael', 'Taylor', '404 Pine Pl', 'michaawel.t@email.com', '565-6543', 'Villageburg', 78901);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Olivia', 'Anderson', '505 Elm Ave', 'olivia.a@email.com', '555-8765', 'Townberg', 12345);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Daniel', 'Smith', '606 Oak Rd', 'daniel.s@email.com', '545-4321', 'Villagetown', 54321);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Grace', 'White', '707 Maple St', 'grace.w@email.com', '585-9876', 'Cityville', 45678);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('William', 'Jones', '808 Cedar Ave', 'william.j@email.com', '555-1234', 'Townburg', 67890);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Ella', 'Martinez', '909 Birch Rd', 'ella.m@email.com', '555-5678', 'Hamletville', 23456);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Andrew', 'Davis', '1010 Pine Blvd', 'andrew.d@email.com', '555-9876', 'Townsville', 78901);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Ava', 'Hernandez', '1111 Elm Ln', 'ava.h@email.com', '555-2199', 'Citytown', 12345);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Jacob', 'Garcia', '1212 Cedar Ct', 'jacob.g@email.com', '555-6743', 'Villageburg', 54321);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Mia', 'Walker', '1313 Birch Pl', 'mia.w@email.com', '555-8065', 'Townberg', 45678);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Matthew', 'Lopez', '1414 Pine Ave', 'matthew.l@email.com', '555-4321', 'Villagetown', 67890);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Sofia', 'Hill', '1515 Elm Rd', 'sofia.h@email.com', '555-2109', 'Cityville', 23456);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Ethan', 'Russell', '1616 Cedar Blvd', 'ethan.r@email.com', '555-6542', 'Townburg', 78901);
+
+INSERT INTO customers (cust_first_name, cust_last_name, cust_address, cust_email, cust_phone_number, cust_city, cust_zip_code)
+VALUES ('Madison', 'Cooper', '1717 Maple Ln', 'madison.c@email.com', '555-8765', 'Hamletville', 12345);
+
+
+--Destinations insert
+SELECT * FROM Destinations;
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ( 'Beach Haven', 'A tropical paradise with pristine sandy beaches and crystal-clear waters.', 'Sunset Coast');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Mountain Retreat', 'A serene mountain getaway surrounded by lush forests and stunning peaks.', 'Highland Valley');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Island Oasis', 'An idyllic island escape featuring palm-fringed beaches and vibrant coral reefs.', 'Azure Archipelago');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Forest Haven', 'A tranquil forest retreat with towering trees and abundant wildlife.', 'Greenwood Forest');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('City Lights', 'A bustling urban destination with iconic landmarks and vibrant nightlife.', 'Metropolis City');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Lakefront Paradise', 'A peaceful lakeside destination with clear waters and scenic landscapes.', 'Crystal Lakes');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Historic Town', 'A charming destination with cobblestone streets and rich historical landmarks.', 'Heritage Village');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Coastal Haven', 'A coastal retreat with picturesque cliffs and breathtaking ocean views.', 'Seaside Bluffs');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Countryside Escape', 'A peaceful countryside destination surrounded by rolling hills and open fields.', 'Tranquil Meadows');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Winter Wonderland', 'A snowy wonderland featuring pristine white landscapes and winter activities.', 'Frosty Peaks');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Skyline City', 'A modern city with skyscrapers and a bustling urban atmosphere.', 'Skyline Metropolis');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Desert Oasis', 'A serene desert destination with golden dunes and starry nights.', 'Golden Sands');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Mystic Valley', 'A mystical valley with enchanting landscapes and hidden wonders.', 'Whispering Valley');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Riverside Retreat', 'A peaceful riverside destination with flowing waters and lush greenery.', 'Tranquil Riverbanks');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Cosmopolitan Hub', 'A cosmopolitan destination with diverse cultures and vibrant street life.', 'City Hub');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Tropical Paradise', 'An exotic tropical destination with palm trees and turquoise waters.', 'Tropical Isles');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Alpine Wonderland', 'An alpine destination with snow-capped peaks and charming chalets.', 'Snowy Alps');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Harbor Haven', 'A harbor town with sailboats and seafood restaurants along the waterfront.', 'Harbor Bay');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Enchanted Forest', 'A magical forest destination with mystical creatures and ancient trees.', 'Enchanted Woods');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Island Retreat', 'A secluded island retreat with white sandy beaches and emerald waters.', 'Serene Islands');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Sunset Bluffs', 'A destination with stunning sunset views from elevated bluffs.', 'Golden Horizons');
+
+INSERT INTO Destinations (dest_name, dest_description, dest_location)
+VALUES ('Historic Harbor', 'A historic harbor town with cobblestone streets and maritime history.', 'Old Harbor');
+
+
+-- Accomodations inserts
+SELECT * FROM Accommodations;
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Cozy Cottage', 1, 'Cottage', 75.00, 10, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Luxury Villa', 2, 'Villa', 150.00, 5, 4);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Seaside Bungalow', 3, 'Bungalow', 100.00, 8, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Mountain Lodge', 4, 'Lodge', 120.00, 6, 5);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('City View Apartment', 5, 'Apartment', 90.00, 12, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Riverside Cabin', 6, 'Cabin', 80.00, 9, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Urban Loft', 7, 'Loft', 110.00, 7, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Historic Inn', 8, 'Inn', 130.00, 4, 6);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Beachfront Resort', 9, 'Resort', 200.00, 3, 8);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Countryside Chalet', 10, 'Chalet', 110.00, 5, 4);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Skyline Penthouse', 11, 'Penthouse', 250.00, 2, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Woodland Retreat', 12, 'Retreat', 95.00, 8, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Ski Lodge', 13, 'Lodge', 120.00, 6, 5);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Urban Oasis', 14, 'Oasis', 85.00, 10, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Country Cottage', 15, 'Cottage', 80.00, 7, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Lakeview Cabin', 16, 'Cabin', 90.00, 9, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Modern Apartment', 17, 'Apartment', 100.00, 12, 2);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Serenity Lodge', 18, 'Lodge', 130.00, 4, 6);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Cityscape Suite', 19, 'Suite', 120.00, 6, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Oceanfront Villa', 20, 'Villa', 180.00, 3, 4);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Mountain View Chalet', 21, 'Chalet', 100.00, 8, 4);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Riverfront Retreat', 22, 'Retreat', 110.00, 5, 3);
+
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Cozy Cottage', 1, 'Cottage', 150.00, 10, 4);
+ 
+INSERT INTO Accommodations (acco_name, acco_id_dest, acco_type, acco_price_per_night, acco_availability, acco_room_capacity)
+VALUES ('Luxury Suite', 2, 'Suite', 300.00, 5, 2);
+
+
+-- Places In Destination inserts
+
+SELECT * FROM PlacesInDestination;
+--DELETE FROM PlacesInDestination WHERE pid_name='Sunset Pier'; -- to delete duplicate rows
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (1, 'Sunny Beach');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (2, 'Sunset Pier');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (3, 'Mountain Viewpoint');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (4, 'Nature Trail');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (2, 'Alpine Chalet');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (3, 'Coral Reef');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (3, 'Tropical Gardens');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (3, 'Island Marketplace');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (4, 'Tranquil Forest Clearing');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (4, 'Wildlife Observation Point');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (12, 'Nature Lodge');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (13, 'City Center');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (14, 'Art District');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (5, 'Waterfront Park');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (6, 'Lakeside Picnic Area');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (6, 'Boathouse');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (6, 'Fishing Pier');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (7, 'Historic Square');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (7, 'Museum District');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (7, 'Waterfront Walkway');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (8, 'Cliffside Viewpoint');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (2, 'Coral Reef');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (2, 'Waterfront Park');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (8, 'Harbor Lighthouse');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES ( 9, 'Vineyard Tour');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (9, 'Country Market');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (10, 'Ski Lodge Lounge');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (10, 'Snowy Slopes');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (11, 'Skyline Observatory');
+
+INSERT INTO PlacesInDestination ( pid_id_dest, pid_name)
+VALUES (11, 'City Park');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (14, 'Palm Cove');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (12, 'Desert Oasis Spa');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (12, 'Cafe Aromatic Spa');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (12, 'Golden Dunes Exploration');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (12, 'Desert Drive')
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (13, 'Mystical Waterfall');
+
+INSERT INTO PlacesInDestination (pid_id_dest, pid_name)
+VALUES (13, 'Enchanted Glade');
+
+-- Flights Inserts
+
+Select * FROM Flights;
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('AA123', 1, 'Airport A', 'Beach Haven Airport', '2023-05-15 08:00:00', '2023-05-15 11:00:00', 250.00, 'Airline A');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('BB456', 2, 'Airport B', 'Mountain Retreat Airport', '2023-06-10 12:00:00', '2023-06-10 15:30:00', 300.00, 'Airline B');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('CC789', 3, 'Airport C', 'Island Oasis Airport', '2023-07-20 10:30:00', '2023-07-20 14:00:00', 350.00, 'Airline C');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('DD101', 4, 'Airport D', 'Forest Haven Airport', '2023-08-05 09:15:00', '2023-08-05 12:45:00', 280.00, 'Airline D');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('EE202', 5, 'Airport E', 'City Lights Airport', '2023-09-15 15:45:00', '2023-09-15 18:30:00', 200.00, 'Airline E');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('FF303', 6, 'Airport F', 'Lakefront Paradise Airport', '2023-10-10 11:00:00', '2023-10-10 14:30:00', 320.00, 'Airline F');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('GG404', 7, 'Airport G', 'Historic Town Airport', '2023-11-20 13:30:00', '2023-11-20 16:45:00', 270.00, 'Airline G');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('HH505', 8, 'Airport H', 'Coastal Haven Airport', '2023-12-05 10:00:00', '2023-12-05 13:15:00', 300.00, 'Airline H');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('II606', 9, 'Airport I', 'Countryside Escape Airport', '2024-01-15 08:30:00', '2024-01-15 11:45:00', 260.00, 'Airline I');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('JJ707', 10, 'Airport J', 'Winter Wonderland Airport', '2024-02-10 12:45:00', '2024-02-10 16:00:00', 310.00, 'Airline J');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('KK808', 11, 'Airport K', 'Skyline City Airport', '2024-03-20 14:15:00', '2024-03-20 17:30:00', 280.00, 'Airline K');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('LL909', 12, 'Airport L', 'Desert Oasis Airport', '2024-04-05 09:30:00', '2024-04-05 12:45:00', 330.00, 'Airline L');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('MM010', 13, 'Airport M', 'Mystic Valley Airport', '2024-05-15 11:00:00', '2024-05-15 14:15:00', 290.00, 'Airline M');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('NN111', 14, 'Airport N', 'Riverside Retreat Airport', '2024-06-10 13:45:00', '2024-06-10 17:00:00', 310.00, 'Airline N');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('OO121', 15, 'Airport O', 'Cosmopolitan Hub Airport', '2024-07-20 15:30:00', '2024-07-20 18:45:00', 280.00, 'Airline O');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('PP131', 16, 'Airport P', 'Tropical Paradise Airport', '2024-08-05 10:15:00', '2024-08-05 13:30:00', 240.00, 'Airline P');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('QQ141', 17, 'Airport Q', 'Alpine Wonderland Airport', '2024-09-15 12:30:00', '2024-09-15 15:45:00', 320.00, 'Airline Q');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('RR151', 18, 'Airport R', 'Harbor Haven Airport', '2024-10-10 14:45:00', '2024-10-10 18:00:00', 290.00, 'Airline R');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('SS161', 19, 'Airport S', 'Enchanted Forest Airport', '2024-11-20 09:00:00', '2024-11-20 12:15:00', 340.00, 'Airline S');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('TT171', 20, 'Airport T', 'Island Retreat Airport', '2024-12-05 11:15:00', '2024-12-05 14:30:00', 300.00, 'Airline T');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('UU181', 21, 'Airport U', 'Sunset Bluffs Airport', '2025-01-15 13:30:00', '2025-01-15 16:45:00', 310.00, 'Airline U');
+
+INSERT INTO Flights (flig_number, flig_id_dest, flig_departure_location, flig_arrival_location, flig_departure_dt, flig_arrival_dt, flig_price, flig_airline)
+VALUES ('VV191', 22, 'Airport V', 'Historic Harbor Airport', '2025-02-10 15:45:00', '2025-02-10 19:00:00', 280.00, 'Airline V');
+
+-- Activities inserts
+
+Select * FROM Activities;
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES ( 1, 'Beach Yoga', 'Relaxing yoga session by the beach with a certified instructor.', 20.00, 60, 15);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (2, 'Mountain Hiking', 'Guided hiking adventure through scenic mountain trails.', 30.00, 120, 10);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (3, 'Island Snorkeling', 'Explore vibrant coral reefs and marine life on a guided snorkeling tour.', 50.00, 90, 8);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (4, 'Forest Trail Biking', 'Adventurous mountain biking through lush forest trails.', 25.00, 75, 12);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (5, 'City Cycling Tour', 'Guided cycling tour to explore the landmarks and culture of the city.', 15.00, 90, 20);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (6, 'Lakeside Kayaking', 'Enjoy a peaceful kayaking experience on a serene lakeside.', 35.00, 120, 8);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (7, 'Historical Walking Tour', 'Discover the history of the town through a guided walking tour.', 18.00, 60, 15);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (8, 'Coastal Boat Cruise', 'Scenic boat cruise along the coast with breathtaking views.', 40.00, 180, 10);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (9, 'Wine Tasting Tour', 'Visit local vineyards and savor a variety of exquisite wines.', 25.00, 120, 12);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (10, 'Skiing Adventure', 'Thrilling skiing experience in the snowy countryside.', 45.00, 90, 8);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (11, 'Cityscape Helicopter Tour', 'A breathtaking helicopter tour offering panoramic city views.', 100.00, 30, 5);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (12, 'Desert Dune Bashing', 'Exciting dune bashing adventure in the desert sands.', 55.00, 60, 10);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (13, 'Mystic Valley Meditation', 'Connect with nature through a guided meditation in a mystical valley.', 22.00, 45, 18);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (14, 'Riverside Fishing', 'Relaxing fishing experience by the riverside with all equipment provided.', 28.00, 90, 15);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (15, 'Art District Gallery Tour', 'Explore the vibrant art district with visits to local galleries.', 20.00, 75, 20);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (16, 'Lakeview Canoeing', 'Enjoy a leisurely canoe ride with stunning lake views.', 30.00, 90, 12);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (17, 'Modern City Art Tour', 'Guided tour showcasing modern art installations in the city.', 25.00, 60, 15);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (18, 'Harbor Sunset Cruise', 'Relaxing sunset cruise through the harbor with scenic views.', 35.00, 120, 10);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (19, 'Enchanted Forest Hike', 'Explore the magical forest with a guided hiking trail.', 28.00, 90, 15);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (20, 'Island Sunset Cruise', 'Enjoy a romantic cruise with breathtaking sunset views on the islands.', 40.00, 150, 8);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (21, 'Sunset Bluffs Hiking', 'Scenic hiking trail with stunning sunset views from elevated bluffs.', 32.00, 90, 12);
+
+INSERT INTO Activities (acti_id_dest, acti_name, acti_description, acti_price, acti_duration, acti_availability)
+VALUES (22, 'Historic Harbor Boat Tour', 'Guided boat tour showcasing the historic landmarks along the harbor.', 38.00, 120, 10);
+
+-- Packages Inserts
+
+SELECT * from Packages;
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Beach Bliss Getaway', 1, 1, 1, 1, 500.00, 'Leisure', 'Relaxing beach vacation with yoga sessions and beachside accommodation.', 10);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Island Paradise Escape', 3, 3, 3, 3, 900.00, 'Leisure', 'Luxurious island escape with snorkeling and beachfront resort accommodation.', 12);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Forest Adventure Getaway', 4, 4, 4, 4, 600.00, 'Adventure', 'Exciting forest adventure with biking and forest lodge accommodation.', 15);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('City Explorer Experience', 5, 5, 5, 5, 400.00, 'City Tour', 'Explore the city with walking tours and city-center hotel accommodation.', 18);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Lakeside Serenity Retreat', 6, 6, 6, 6, 550.00, 'Leisure', 'Peaceful lakeside retreat with kayaking and lakeside cottage accommodation.', 10);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Historical Town Discovery', 7, 7, 7, 7, 450.00, 'City Tour', 'Discover the history of the town with walking tours and historic inn accommodation.', 12);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Coastal Escape Cruise', 8, 8, 8, 8, 800.00, 'Leisure', 'Relaxing coastal escape with a boat cruise and coastal resort accommodation.', 8);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Wine Country Retreat', 9, 9, 9, 9, 650.00, 'Leisure', 'Explore the wine country with a wine tasting tour and vineyard accommodation.', 15);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Snowy Wonderland Adventure', 10, 10, 10, 10, 750.00, 'Adventure', 'Thrilling snowy adventure with skiing and ski lodge accommodation.', 10);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('City Lights Helicopter Tour', 11, 11, 11, 11, 1200.00, 'City Tour', 'Breathtaking helicopter tour with panoramic city views and luxury hotel accommodation.', 5);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Desert Dunes Adventure', 12, 12, 12, 12, 850.00, 'Adventure', 'Exciting desert dune bashing adventure with desert lodge accommodation.', 12);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Mystical Valley Retreat', 13, 13, 13, 13, 550.00, 'Leisure', 'Connect with nature through meditation in a mystical valley with valley accommodation.', 18);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Riverside Relaxation Getaway', 14, 14, 14, 14, 700.00, 'Leisure', 'Relaxing riverside getaway with fishing and riverside cabin accommodation.', 15);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Art District Experience', 15, 15, 15, 15, 500.00, 'City Tour', 'Explore the vibrant art district with gallery tours and art-themed hotel accommodation.', 20);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Lakeview Canoe Retreat', 16, 16, 16, 16, 650.00, 'Leisure', 'Enjoy a peaceful lakeview retreat with canoeing and lakeside cabin accommodation.', 12);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Modern City Art Expedition', 17, 17, 17, 17, 600.00, 'City Tour', 'Guided tour showcasing modern art installations with art-themed hotel accommodation.', 15);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Harbor Sunset Cruise Retreat', 18, 18, 18, 18, 750.00, 'Leisure', 'Relaxing retreat with a harbor sunset cruise and waterfront resort accommodation.', 10);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Enchanted Forest Expedition', 19, 19, 19, 19, 700.00, 'Adventure', 'Explore the magical forest with a guided expedition and forest cabin accommodation.', 15);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Island Sunset Cruise Getaway', 20, 20, 20, 20, 900.00, 'Leisure', 'Romantic getaway with an island sunset cruise and beachfront resort accommodation.', 8);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Sunset Bluffs Hiking Retreat', 21, 21, 21, 21, 680.00, 'Adventure', 'Scenic hiking retreat with elevated bluffs and hiking lodge accommodation.', 12);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Historic Harbor Boat Tour Experience', 22, 22, 22, 22, 800.00, 'City Tour', 'Guided boat tour showcasing historic landmarks with waterfront hotel accommodation.', 10);
+
+INSERT INTO Packages (pack_name, pack_id_dest, pack_id_acco, pack_id_flig, pack_id_acti, pack_price, pack_type, pack_description, pack_availability)
+VALUES ('Mountain Explorer Retreat', 3, 2, 3, 2, 700.00, 'Adventure', 'Adventure-packed retreat in the mountains with hiking and cozy mountain cabin accommodation.', 8);
+
+-- Bookings Inserts:
+
+SElect * FROM Bookings
+ORDER BY book_id_cust;
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (1, 1, 1, 1, 1, 1, '2023-05-10 08:00:00', '2023-06-01 14:00:00', '2023-06-10 11:00:00', 800.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES ( 2, 2, 2, 2, 2, 2, '2023-06-15 10:00:00', '2023-07-05 12:00:00', '2023-07-15 10:00:00', 1200.00, 'Confirmed');
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES ( 54, 3, 26, 4, 7, 7, '2023-06-15 10:00:00', '2023-07-05 12:00:00', '2023-07-15 10:00:00', 1200.00, 'Confirmed');-- TOP 2nd
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES ( 154, 3, 26, 4, 7, 7, '2023-06-15 10:00:00', '2023-07-05 12:00:00', '2023-07-15 10:00:00', 1200.00, 'Confirmed');-- TOP 2nd
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES ( 163, 3, 26, 4, 7, 7, '2023-06-15 10:00:00', '2023-07-05 12:00:00', '2023-07-15 10:00:00', 1200.00, 'Confirmed');-- TOP 2nd
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES ( 90, 3, 26, 4, 7, 7, '2023-06-15 10:00:00', '2023-07-05 12:00:00', '2023-07-15 10:00:00', 1200.00, 'Confirmed');-- TOP 2nd
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (3, 3, 3, 3, 3, 3, '2023-07-20 12:00:00', '2023-08-10 15:00:00', '2023-08-20 12:00:00', 950.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (4, 4, 4, 4, 4, 4, '2023-08-25 14:00:00', '2023-09-15 16:00:00', '2023-09-25 14:00:00', 700.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (89, 5, 19, 22, 5, 4, '2023-09-30 16:00:00', '2023-10-20 10:00:00', '2023-10-30 16:00:00', 1100.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (6, 6, 6, 6, 6, 6, '2023-10-05 18:00:00', '2023-11-01 08:00:00', '2023-11-10 18:00:00', 900.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (7, 7, 7, 7, 7, 7, '2023-11-10 20:00:00', '2023-12-01 10:00:00', '2023-12-10 20:00:00', 750.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (8, 8, 8, 8, 8, 8, '2023-12-15 22:00:00', '2024-01-05 12:00:00', '2024-01-15 22:00:00', 1000.00, 'Pending');
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (91, 8, 8, 8, 8, 8, '2023-12-15 22:00:00', '2024-01-05 12:00:00', '2024-01-15 22:00:00', 1000.00, 'Pending'); -- top 4
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (9, 9, 9, 9, 9, 9, '2024-01-20 08:00:00', '2024-02-10 14:00:00', '2024-02-20 11:00:00', 850.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (10, 10, 10, 10, 10, 10, '2024-02-25 10:00:00', '2024-03-15 12:00:00', '2024-03-25 10:00:00', 1300.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (11, 11, 11, 11, 11, 11, '2024-03-30 12:00:00', '2024-04-20 15:00:00', '2024-04-30 12:00:00', 950.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (12, 12, 12, 12, 12, 12, '2024-04-05 14:00:00', '2024-05-01 16:00:00', '2024-05-05 14:00:00', 700.00, 'Confirmed');
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (85, 12, 12, 12, 12, 12, '2024-04-05 14:00:00', '2024-05-01 16:00:00', '2024-05-05 14:00:00', 700.00, 'Confirmed'); -- Top3 
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (152, 12, 12, 12, 12, 12, '2024-04-05 14:00:00', '2024-05-01 16:00:00', '2024-05-05 14:00:00', 700.00, 'Confirmed'); -- Top3
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (13, 13, 13, 13, 13, 13, '2024-05-10 16:00:00', '2024-06-01 10:00:00', '2024-06-10 16:00:00', 1100.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (14, 14, 14, 14, 14, 14, '2024-06-15 18:00:00', '2024-07-05 08:00:00', '2024-07-15 18:00:00', 900.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (15, 15, 15, 15, 15, 15, '2024-07-20 20:00:00', '2024-08-10 12:00:00', '2024-08-20 20:00:00', 750.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (16, 16, 16, 16, 16, 16, '2024-08-25 22:00:00', '2024-09-15 14:00:00', '2024-09-25 22:00:00', 1000.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (17, 17, 17, 17, 17, 17, '2024-09-30 08:00:00', '2024-10-20 10:00:00', '2024-10-30 08:00:00', 850.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (18, 18, 18, 18, 18, 18, '2024-10-05 10:00:00', '2024-11-01 12:00:00', '2024-11-10 10:00:00', 1300.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (19, 19, 19, 19, 19, 19, '2024-11-10 12:00:00', '2024-12-01 14:00:00', '2024-12-10 12:00:00', 950.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (20, 20, 20, 20, 20, 20, '2024-12-15 14:00:00', '2025-01-05 16:00:00', '2025-01-15 14:00:00', 700.00, 'Pending');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (21, 21, 21, 21, 21, 21, '2025-01-20 16:00:00', '2025-02-10 18:00:00', '2025-02-20 16:00:00', 1100.00, 'Confirmed');
+
+INSERT INTO Bookings (book_id_cust, book_id_dest, book_id_acco, book_id_flig, book_id_acti, book_id_pack, book_dt, book_check_in_dt, book_check_out_dt, book_total_price, book_status)
+VALUES (22, 22, 22, 22, 22, 22, '2025-02-25 18:00:00', '2025-03-15 20:00:00', '2025-03-25 18:00:00', 900.00, 'Pending');
+
+--Reviews Inserts
+
+SELECT * FROM Reviews;
+
+--INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+--VALUES (1, 1, 1, 1, NULL, NULL, NULL, 4, 'Great experience! The destination was beautiful, and the package offered a variety of activities.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (10, 2, 2, 2, 15, NULL, 5, 'Amazing trip! The accommodation was comfortable, and the activities were thrilling.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (12, 3, NULL, NULL, 3, 3, 3, 'Average experience. The flight was delayed, and the activities were not as exciting as expected.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (89, 4, 4, 9, 4, NULL, 5, 'Absolutely loved it! The accommodation was luxurious, and the flight was smooth.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (152, 5, 18, 16, 5, 5, 4, 'Good trip overall. The destination had a lot to offer, and the activities were enjoyable.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (85, 6, 18, NULL, NULL, NULL, 5, 'Peaceful retreat! The lakeside accommodation was serene, and the canoeing activity was a highlight.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (13, 7, 7, 7, 7, NULL, 3, 'Disappointing experience. The city tour was not as informative as expected.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (20, 8, 8, 8, 8, 8, 4, 'Great coastal escape! The boat cruise was relaxing, and the coastal resort was beautiful.');
+
+/*
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (9, 9, 9, 9, 9, 9, 9, 5, 'Wine country delight! The vineyard accommodation was charming, and the wine tasting tour was fantastic.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (10, 10, 10, 10, 10, 10, 10, 4, 'Snowy adventure! The ski lodge accommodation was cozy, and the skiing experience was thrilling.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (11, 11, 11, 11, 11, 11, 11, 5, 'Breathtaking helicopter tour! The city views were incredible, and the hotel was luxurious.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (12, 12, 12, 12, 12, 12, 12, 3, 'Desert adventure. The desert lodge was comfortable, but the dune bashing activity was too intense.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (13, 13, 13, 13, 13, 13, 13, 4, 'Scenic cruise! The boat tour offered beautiful views, and the seaside hotel was charming.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (14, 14, 14, 14, 14, 14, 14, 5, 'Unforgettable experience! The mountain cabin was cozy, and the guided expedition was adventurous.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (15, 15, 15, 15, 15, 15, 15, 4, 'Relaxing beach retreat. The beachfront resort was fantastic, and the sunset cruise was romantic.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (16, 16, 16, 16, 16, 16, 16, 5, 'Hiking paradise! The hiking lodge was comfortable, and the trails offered stunning views.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (17, 17, 17, 17, 17, 17, 17, 3, 'City exploration. The city tour was informative, but the hotel was average.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (18, 18, 18, 18, 18, 18, 18, 4, 'Historic tour! The boat tour showcased interesting landmarks, and the waterfront hotel was delightful.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (19, 19, 19, 19, 19, 19, 19, 5, 'Enchanting forest. The guided expedition was magical, and the forest cabin was cozy.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (20, 20, 20, 20, 20, 20, 20, 4, 'Island paradise! The island sunset cruise was romantic, and the beachfront resort was beautiful.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (21, 21, 21, 21, 21, 21, 21, 3, 'Scenic bluffs. The hiking retreat offered scenic views, but the lodge was basic.');
+
+INSERT INTO Reviews (revi_id_cust, revi_id_dest, revi_id_pack, revi_id_acco, revi_id_flig, revi_id_acti, revi_rating, revi_review)
+VALUES (22, 22, 22, 22, 22, 22, 22, 5, 'Harbor tour delight! The boat tour showcased historic landmarks, and the waterfront hotel was fantastic.');
+*/
+
+--Payments Inserts
+
+SELECT * FROM Payments;
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES ( 1, 1, 'Credit Card', '2023-05-15 10:30:00', 800.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (10, 11, 'PayPal', '2023-06-20 12:45:00', 1200.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (13, 17, 'Credit Card', '2023-07-25 15:00:00', 950.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (54, 42, 'Credit Card', '2023-08-30 17:15:00', 700.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (90, 58, 'PayPal', '2023-10-05 08:30:00', 1100.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (85, 55, 'Credit Card', '2023-11-10 10:45:00', 900.00, 'Successful');
+
+/*
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (7, 7, 'PayPal', '2023-12-15 13:00:00', 750.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (8, 8, 'Credit Card', '2024-01-20 15:15:00', 1000.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (9, 9, 'PayPal', '2024-02-25 17:30:00', 850.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (10, 10, 'Credit Card', '2024-04-01 09:45:00', 1300.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (11, 11, 'Credit Card', '2024-05-06 12:00:00', 950.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (12, 12, 'PayPal', '2024-06-10 14:15:00', 700.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (13, 13, 'Credit Card', '2024-07-15 16:30:00', 1100.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (14, 14, 'PayPal', '2024-08-20 18:45:00', 900.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (15, 15, 'Credit Card', '2024-09-25 21:00:00', 750.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (16, 16, 'Credit Card', '2024-10-30 08:15:00', 1000.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (17, 17, 'PayPal', '2024-12-04 10:30:00', 850.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (18, 18, 'Credit Card', '2025-01-08 12:45:00', 1300.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (19, 19, 'Credit Card', '2025-02-12 15:00:00', 950.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (20, 20, 'PayPal', '2025-03-18 17:15:00', 700.00, 'Pending');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (21, 21, 'Credit Card', '2025-04-22 09:30:00', 1100.00, 'Successful');
+
+INSERT INTO Payments (pay_id_cust, pay_id_book, pay_method, pay_transaction_dt, pay_total_amount, pay_transaction_status)
+VALUES (22, 22, 'PayPal', '2025-05-27 11:45:00', 900.00, 'Successful');
+*/
+
+
