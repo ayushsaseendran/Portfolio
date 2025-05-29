@@ -4,7 +4,7 @@
 
 - **Master of Science in Applied Data Science**  
   Syracuse University, School of Information Studies, Syracuse, NY  
-  **GPA**: 3.9/4 (Aug 2023 – May 2025)  
+  **GPA**: 3.8/4 (Aug 2023 – May 2025)  
   **Relevant Coursework**: Data Science, DBMS, Applied Machine Learning, Data Warehouse, Big Data Management, NLP, Cloud Management
 
 - **Bachelor of Engineering in Electronics and Telecommunication Engineering**  
